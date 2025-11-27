@@ -154,7 +154,26 @@ class ProjectEnv(gym.Env):
             self.clock.tick(self.metadata["render_fps"])
         else:  # rgb_array
             return np.transpose(np.array(pygame.surfarray.pixels3d(canvas)), axes=(1, 0, 2))
+def rgb_to_codes(surface):
 
+        rgb_array = np.transpose(np.array(pygame.surfarray.pixels3d(surface)), axes=(1, 0, 2))
+
+        code_array = np.zeros((rgb_array.shape[0], rgb_array.shape[1]), dtype=int)
+    
+        for r in range(rgb_array.shape[0]):
+            for c in range(rgb_array.shape[1]):
+                rgb = tuple(rgb_array[r, c])
+                if rgb == (255, 255, 255):       # White background
+                    code_array[r, c] = 0
+                elif rgb == (0, 150, 255):       # Path
+                    code_array[r, c] = 1
+                elif rgb == (255, 0, 0):         # Red building / Entrance A
+                    code_array[r, c] = 2
+                elif rgb == (0, 255, 0):         # Green building / Entrance B
+                    code_array[r, c] = 3
+                else:
+                    code_array[r, c] = -1        # Unknown colour
+        return code_array
 
     def close(self):
         if self.window is not None:
